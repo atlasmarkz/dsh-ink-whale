@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="zh-CN" data-mui data-mui-scope data-mui-active data-mui-dark>
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ink Whale · 墨鲸</title>
+<style>
+  :root{
+    color-scheme: light;
+    --bg:#ffffff; --panel:#ffffff; --paper:#f7f6f2;
+    --text:#141518; --muted:#71736f; --faint:#9b9d98; --line:#e6e5e0;
+    --accent:#3f6d8e; --accent-soft:#dcebf5;
+    --dsw-alias-bg-base:#ffffff; --dsw-alias-bg-layer-1:#ffffff;
+    --dsw-alias-label-primary:#141518; --dsw-alias-label-secondary:#71736f;
+    --dsw-alias-label-tertiary:#9b9d98; --dsw-alias-border-l2:#e6e5e0;
+    --dsw-alias-brand-primary:#141518;
+  }
+  html[data-mui-dark]{
+    color-scheme: dark;
+    --bg:#0b0c0d; --panel:#0b0c0d; --paper:#07080a;
+    --text:#efefed; --muted:#9a9c9b; --faint:#6a6c6b; --line:#232527;
+    --accent:#86bce0; --accent-soft:#1b2a33;
+    --dsw-alias-bg-base:#0b0c0d; --dsw-alias-bg-layer-1:#101113;
+    --dsw-alias-label-primary:#efefed; --dsw-alias-label-secondary:#9a9c9b;
+    --dsw-alias-label-tertiary:#6a6c6b; --dsw-alias-border-l2:#232527;
+    --dsw-alias-brand-primary:#efefed;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;background:var(--bg);color:var(--text);
+    font:14px/1.55 -apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Helvetica Neue",Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;overflow:hidden;
+  }
+  .app{display:flex;height:100vh}
+  /* ---------- sidebar ---------- */
+  .side{
+    width:248px;flex:none;display:flex;flex-direction:column;gap:2px;
+    padding:14px 12px 12px;border-right:1px solid var(--line);background:var(--panel);
+  }
+  .brand{display:flex;align-items:center;gap:9px;padding:4px 8px 16px}
+  .mark{
+    width:26px;height:26px;border:1px solid var(--text);border-radius:7px;
+    display:grid;place-items:center;font:600 11px/1 ui-monospace,Menlo,monospace;letter-spacing:-.04em;
+  }
+  .brand-name{font-weight:600;font-size:13.5px;letter-spacing:.01em}
+  .brand-sub{font:10px/1.2 ui-monospace,Menlo,monospace;color:var(--faint);letter-spacing:.14em;margin-top:2px}
+  .new{
+    display:flex;align-items:center;gap:8px;margin:0 0 12px;padding:7px 10px;
+    border:1px solid var(--line);border-radius:9px;color:var(--text);font-size:13px;cursor:default;
+  }
+  .new kbd{margin-left:auto;color:var(--faint);font:10px/1 ui-monospace,Menlo,monospace}
+  .nav-label{font:10px/1 ui-monospace,Menlo,monospace;letter-spacing:.14em;color:var(--faint);padding:8px 10px 6px}
+  .nav-item{display:flex;align-items:center;gap:9px;padding:6px 9px;border-radius:7px;color:var(--muted);font-size:13px}
+  .nav-item .dot{width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.55}
+  .nav-item.on{background:color-mix(in srgb,var(--text) 6%,transparent);color:var(--text)}
+  .side .grow{flex:1}
+  .side-foot{display:flex;align-items:center;gap:9px;padding:8px 9px;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+  .avatar{width:22px;height:22px;border-radius:50%;background:var(--text);color:var(--bg);display:grid;place-items:center;font-size:10px;font-weight:600}
+  /* ---------- main ---------- */
+  .main{flex:1;min-width:0;position:relative;isolation:isolate;overflow:hidden;background:var(--paper)}
+  .topbar{
+    position:absolute;z-index:5;top:0;left:0;right:0;height:48px;display:flex;align-items:center;
+    justify-content:flex-end;gap:8px;padding:0 20px;color:var(--muted);font-size:12px;
+  }
+  .pill{border:1px solid var(--line);border-radius:999px;padding:3px 10px;background:color-mix(in srgb,var(--bg) 55%,transparent)}
+  .stage{position:absolute;inset:0;z-index:0;display:flex;align-items:center;justify-content:center;padding:96px 8vw 120px}
+  .hero{position:relative;z-index:2;width:min(660px,100%);display:flex;flex-direction:column;align-items:center;text-align:center}
+  .kicker{font:10px/1 ui-monospace,Menlo,monospace;letter-spacing:.34em;color:var(--faint);margin-bottom:18px}
+  #title{width:auto;height:auto;margin:0}
+  .sub{margin:20px 0 0;color:var(--muted);font-size:13.5px;letter-spacing:.01em}
+  .sub b{color:var(--text);font-weight:500}
+  .hints{display:flex;gap:22px;margin-top:26px;color:var(--faint);font-size:11.5px}
+  .hints span{display:flex;align-items:center;gap:6px}
+  .hints i{width:4px;height:4px;border-radius:50%;background:var(--accent);opacity:.8}
+  /* ---------- composer ---------- */
+  .composer{
+    position:absolute;z-index:4;left:50%;bottom:34px;transform:translateX(-50%);
+    width:min(660px,calc(100% - 64px));
+  }
+  .card{
+    position:relative;isolation:isolate;border:1px solid var(--line);border-radius:14px;
+    padding:14px 16px 10px;background:transparent;
+    box-shadow:0 16px 44px rgba(10,10,10,.07), 0 1px 2px rgba(10,10,10,.04), inset 0 1px 0 rgba(255,255,255,.7);
+  }
+  .card::before{
+    content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;pointer-events:none;
+    background:linear-gradient(158deg,rgba(255,255,255,.42),rgba(255,255,255,.08) 52%,rgba(255,255,255,.22)),
+      color-mix(in srgb,var(--dsw-alias-bg-layer-1) 18%,transparent);
+    -webkit-backdrop-filter:blur(14px) saturate(1.04) brightness(1.01);
+    backdrop-filter:blur(14px) saturate(1.04) brightness(1.01);
+  }
+  html[data-mui-dark] .card{border-color:rgba(255,255,255,.16);box-shadow:0 16px 44px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.14)}
+  html[data-mui-dark] .card::before{
+    background:linear-gradient(158deg,rgba(255,255,255,.12),rgba(255,255,255,.02) 52%,rgba(255,255,255,.06)),rgba(20,22,24,.30);
+  }
+  .ph{color:var(--faint);font-size:14px;padding:2px 2px 16px}
+  .card-row{display:flex;align-items:center;gap:6px;color:var(--muted)}
+  .tool{width:28px;height:28px;border-radius:7px;display:grid;place-items:center;border:1px solid transparent;font:11px/1 ui-monospace,Menlo,monospace}
+  .tool:hover{border-color:var(--line)}
+  .send{margin-left:auto;width:30px;height:30px;border-radius:50%;background:var(--text);color:var(--bg);display:grid;place-items:center;font-size:13px}
+  .under{display:flex;justify-content:space-between;color:var(--faint);font-size:11px;padding:9px 4px 0}
+  .under span{display:flex;align-items:center;gap:6px}
+  .status-dot{width:5px;height:5px;border-radius:50%;background:var(--accent)}
+  /* ---------- layers ---------- */
+  [data-mui-field],[data-mui-whale]{position:absolute;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+  [data-mui-whale]{opacity:.62}
+  [data-mui-field] > canvas,[data-mui-whale] > canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+  [data-mui-whale] > canvas{font-family:"Whales Mono",ui-monospace,Menlo,monospace;font-weight:600}
+  /* corner caption */
+  .stamp{position:absolute;z-index:6;right:22px;bottom:18px;text-align:right;color:var(--faint);font:9.5px/1.7 ui-monospace,Menlo,monospace;letter-spacing:.16em}
+  .stamp b{display:block;color:var(--muted);font-weight:500}
+  .toggle{position:absolute;z-index:9;right:18px;top:14px;border:1px solid var(--line);background:color-mix(in srgb,var(--bg) 70%,transparent);color:var(--muted);border-radius:999px;padding:4px 11px;font:11px/1.4 ui-monospace,Menlo,monospace;cursor:pointer}
+  .toggle:hover{color:var(--text)}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="brand">
+      <div class="mark">IW</div>
+      <div><div class="brand-name">Ink Whale</div><div class="brand-sub">DSH THEME</div></div>
+    </div>
+    <div class="new">＋ 新建会话 <kbd>⌘N</kbd></div>
+    <div class="nav-label">SESSIONS</div>
+    <div class="nav-item on"><span class="dot"></span>黑白鲸游主题</div>
+    <div class="nav-item"><span class="dot"></span>ASCII 鲸鱼引擎</div>
+    <div class="nav-item"><span class="dot"></span>信号场排障记录</div>
+    <div class="nav-item"><span class="dot"></span>毛玻璃与标题</div>
+    <div class="side .grow"></div>
+    <div class="nav-label">WORKSPACE</div>
+    <div class="nav-item"><span class="dot"></span>设置</div>
+    <div class="nav-item"><span class="dot"></span>插件</div>
+    <div class="side-foot"><div class="avatar">M</div><div>mark · 本地</div></div>
+  </aside>
+  <main class="main">
+    <div class="topbar"><span class="pill">⌘K 命令</span><span class="pill">v0.2.2</span></div>
+    <div class="stage">
+      <div data-mui-field></div>
+      <div data-mui-whale></div>
+      <div class="hero">
+        <div class="kicker">AN INK STUDY</div>
+        <div data-mui-title id="title"></div>
+        <p class="sub">在墨色的信号场里，让<b>淡蓝色的 ASCII 鲸群</b>慢慢游过。</p>
+        <div class="hints"><span><i></i>黑白界面</span><span><i></i>单一蓝调</span><span><i></i>30 fps</span></div>
+      </div>
+    </div>
+    <div class="composer">
+      <div class="card" data-composer-card>
+        <div class="ph">给 DeepSeek 发送消息…</div>
+        <div class="card-row">
+          <div class="tool">＋</div><div class="tool">/</div><div class="tool">◇</div>
+          <div class="send">↑</div>
+        </div>
+      </div>
+      <div class="under"><span><i class="status-dot"></i>ink-whale · connected</span><span>⌘↵ 发送</span></div>
+    </div>
+    <div class="stamp"><b>INK WHALE</b>墨鲸 · 0.1.0</div>
+    <button class="toggle" id="toggle">DARK</button>
+  </main>
+</div>
+<script type="module">
+import { CSS } from '../src/styles.js';
+import { createField } from '../src/field.js';
+import { createTechText, measureTitle } from '../src/techtext.js';
+import { createWhaleField } from '../src/whale-field.js';
+
+const style = document.createElement('style');
+style.textContent = CSS;
+document.head.append(style);
+
+const params = new URLSearchParams(location.search);
+let dark = params.get('theme') !== 'light';
+document.documentElement.toggleAttribute('data-mui-dark', dark);
+document.getElementById('toggle').textContent = dark ? 'LIGHT' : 'DARK';
+
+const fieldHost = document.querySelector('[data-mui-field]');
+const whaleHost = document.querySelector('[data-mui-whale]');
+const titleHost = document.getElementById('title');
+
+const intensity = Number(params.get('intensity') || 0.24);
+const count = Number(params.get('whales') || 3);
+const size = Number(params.get('size') || 0.8);
+const whaleColor = params.get('whale') ? `#${params.get('whale')}` : undefined;
+const whaleGlyph = params.get('glyph') ? `#${params.get('glyph')}` : undefined;
+fieldHost.setAttribute('data-on', '');
+const field = createField(fieldHost, { dark, intensity, idle: true, interact: true, fps: 30, speed: 1 });
+window.__field = field;
+const whale = createWhaleField(whaleHost, {
+  dark, species: 'humpback', count, size, speed: 0.5, bodySwing: 0.75, color: whaleColor, glyphColor: whaleGlyph,
+  turnAgility: 0.8, tailFrequency: 0.85, gridScale: 0.5, gridOpacity: 0.1,
+  fishCount: 188, wake: 1, opacity: 0.55, fps: 30, interact: true,
+});
+
+const titleText = 'DEEPSEEK HARNESS';
+const fontFamily = getComputedStyle(document.body).fontFamily;
+const probe = document.createElement('span');
+probe.textContent = titleText;
+probe.style.cssText = `position:absolute;visibility:hidden;white-space:nowrap;font:600 54px ${fontFamily};letter-spacing:-0.27px`;
+document.body.append(probe);
+const box = { width: Math.ceil(probe.getBoundingClientRect().width) + 10, height: 72 };
+probe.remove();
+titleHost.style.width = box.width + 'px';
+titleHost.style.height = box.height + 'px';
+const color = dark ? '#efefed' : '#141518';
+const title = createTechText(titleHost, titleText, {
+  fontFamily, fontWeight: 600, fontSize: 54, color, accentColor: color,
+  reach: 140, specks: 12, sweep: params.get('sweep') === '1', speed: 0.9,
+});
+
+document.getElementById('toggle').addEventListener('click', () => {
+  dark = !dark;
+  document.documentElement.toggleAttribute('data-mui-dark', dark);
+  document.getElementById('toggle').textContent = dark ? 'LIGHT' : 'DARK';
+  document.documentElement.style.setProperty('--dsw-alias-bg-base', dark ? '#0b0c0d' : '#ffffff');
+  document.documentElement.style.setProperty('--dsw-alias-label-primary', dark ? '#efefed' : '#141518');
+  field.update({ dark, intensity, idle: true, interact: true, fps: 30, speed: 1 });
+  whale.update({
+    dark, species: 'humpback', count, size, speed: 0.5, bodySwing: 0.75, color: whaleColor, glyphColor: whaleGlyph,
+    turnAgility: 0.8, tailFrequency: 0.85, gridScale: 0.5, gridOpacity: 0.1,
+    fishCount: 188, wake: 1, opacity: 0.55, fps: 30, interact: true,
+  });
+  title.refresh({ color: dark ? '#efefed' : '#141518', accentColor: dark ? '#efefed' : '#141518' });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+node_modules/
+.DS_Store
+preview/*.png
+!preview/final-light.png
+!preview/final-dark.png

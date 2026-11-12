@@ -1,0 +1,4 @@
+# dsh-ink-whale 的 bundle 行：Host 侧仅占位，全部能力在 Client 侧实现。
+- insert:
+    - id: ink-whale
+      name: dsh-ink-whale
